@@ -31,3 +31,4 @@ ___
 
 - Make sure you are running the same version of node as specified in `.nvmrc` (Recommended to use a tool like `nvm` or `fnm`)
 - Copy `.env.example` to `.env` and fill placeholders with real values.
+- Run `npm run dev` to start the local server.
