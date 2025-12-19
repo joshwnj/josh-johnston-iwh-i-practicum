@@ -17,6 +17,7 @@ html(lang="en")
                 tbody
                 each quest in data
                     tr
-                        td #{quest.properties.name}
+                        td
+                            a(href=`/update-cobj?id=${quest.id}`) #{quest.properties.name}
                         td $#{quest.properties.reward}
                         td #{quest.properties.description}

@@ -50,16 +50,48 @@ app.get('/', async (req, res) => {
 // ROUTE 2 - Create a new app.get route for the form to create or update new custom object data. Send this data along in the next route.
 
 // * Code for Route 2 goes here
-app.get('/update-cobj', (req, res) => {
-  const contactEmail = ''
-  const quest = {}
+app.get('/update-cobj', async (req, res) => {
+  const { id } = req.query
 
-  res.render('updates', {
-    title: `Update Custom Object Form | ${SITE_TITLE}`,
-    contactEmail,
-    quest,
-    error: null
-  })
+  if (id) {
+    const qs = querystring.stringify({
+      properties: [
+        'name',
+        'description',
+        'reward'
+        ].join(',')
+    })
+    const url = `https://api.hubapi.com/crm/v3/objects/${OBJECT_TYPE_IDS.QUESTS}/${id}?${qs}`
+    const headers = {
+      Authorization: `Bearer ${PRIVATE_APP_ACCESS}`,
+      'Content-Type': 'application/json'
+    };
+
+    try {
+      const resp = await axios.get(url, { headers });
+
+      const { data } = resp;
+      const quest = data.properties
+
+      res.render('updates', {
+        title: `Update Custom Object Form | ${SITE_TITLE}`,
+        id,
+        quest,
+        error: null
+      })
+    } catch (err) {
+      console.error(err);
+    }
+  }
+  else {
+    const quest = {}
+
+    res.render('updates', {
+      title: `Create Custom Object Form | ${SITE_TITLE}`,
+      quest,
+      error: null
+    })
+  }
 })
 
 // ROUTE 3 - Create a new app.post route for the custom objects form to create or update your custom object data. Once executed, redirect the user to the homepage.
@@ -67,6 +99,7 @@ app.get('/update-cobj', (req, res) => {
 // * Code for Route 3 goes here
 app.post('/update-cobj', async (req, res) => {
   const {
+    id,
     name,
     description,
     reward
@@ -86,13 +119,34 @@ app.post('/update-cobj', async (req, res) => {
       'Content-Type': 'application/json'
   };
 
-  try {
-      await axios.post(url, payload, { headers } );
+  const isUpdate = !!id
+  if (isUpdate) {
+    try {
+      await axios.patch(`${url}/${id}`, payload, { headers });
       res.redirect('/');
-  } catch(err) {
+    } catch (err) {
       console.error(err);
       res.render('updates', {
         title: `Update Custom Object Form | ${SITE_TITLE}`,
+        contactEmail: '',
+        quest: {
+          id,
+          name,
+          description,
+          reward
+        },
+        error: err.message
+      })
+    }
+  } else {
+    // create a new object
+    try {
+      await axios.post(url, payload, { headers });
+      res.redirect('/');
+    } catch (err) {
+      console.error(err);
+      res.render('updates', {
+        title: `Create Custom Object Form | ${SITE_TITLE}`,
         contactEmail: '',
         quest: {
           name,
@@ -101,6 +155,7 @@ app.post('/update-cobj', async (req, res) => {
         },
         error: err.message
       })
+    }
   }
 })
 

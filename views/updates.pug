@@ -11,8 +11,10 @@ html(lang="en")
                 .error #{error}
             .form-wrapper
                 form(method="POST")
+                    input(type="hidden" name="id" value=id)
+
                     label(for="name") Contact Email
-                    input(type="text" name="contactEmail" value=contactEmail required)
+                    input(type="text" name="contactEmail" value=contactEmail)
 
                     label(for="name") Quest Name
                     input(type="text" name="name" value=quest.name required)
