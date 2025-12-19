@@ -79,6 +79,8 @@ async function fetchSingleQuest({ id }) {
 }
 
 async function updateQuest ({ id, payload }) {
+  // TODO: handle updating contact association
+  //
   const url = `https://api.hubapi.com/crm/v3/objects/${OBJECT_TYPE_IDS.QUESTS}`
   const headers = {
       Authorization: `Bearer ${PRIVATE_APP_ACCESS}`,
@@ -89,6 +91,8 @@ async function updateQuest ({ id, payload }) {
 }
 
 async function createQuest ({ payload }) {
+  // TODO: handle creating contact association
+
   const url = `https://api.hubapi.com/crm/v3/objects/${OBJECT_TYPE_IDS.QUESTS}`
   const headers = {
       Authorization: `Bearer ${PRIVATE_APP_ACCESS}`,
