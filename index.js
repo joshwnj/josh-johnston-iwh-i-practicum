@@ -3,6 +3,7 @@ require('dotenv').config()
 const express = require('express');
 const axios = require('axios');
 const app = express();
+const querystring = require('querystring');
 
 app.set('view engine', 'pug');
 app.use(express.static(__dirname + '/public'));
@@ -23,7 +24,14 @@ const OBJECT_TYPE_IDS = {
 
 // * Code for Route 1 goes here
 app.get('/', async (req, res) => {
-  const url = `https://api.hubapi.com/crm/v3/objects/${OBJECT_TYPE_IDS.QUESTS}?properties=name,description,reward`
+  const qs = querystring.stringify({
+    properties: [
+      'name',
+      'description',
+      'reward'
+      ].join(',')
+  })
+  const url = `https://api.hubapi.com/crm/v3/objects/${OBJECT_TYPE_IDS.QUESTS}?${qs}`
   const headers = {
       Authorization: `Bearer ${PRIVATE_APP_ACCESS}`,
       'Content-Type': 'application/json'
