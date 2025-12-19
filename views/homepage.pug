@@ -5,17 +5,18 @@ html(lang="en")
         meta(name="viewport" content="width=device-width, initial-scale=1")
         link(rel="stylesheet", href="/css/style.css")
     body
-        h1 Quests
-        a(href="/update-cobj") Add to this table
-        table
-            thead
-                tr
-                    th Name
-                    th Reward
-                    th Description
-            tbody
-            each quest in data
-                tr
-                    td #{quest.properties.name}
-                    td $#{quest.properties.reward}
-                    td #{quest.properties.description}
+        .page-wrapper
+            h1 Quests
+            a(href="/update-cobj") Add to this table
+            table.results
+                thead
+                    tr
+                        th Name
+                        th Reward
+                        th Description
+                tbody
+                each quest in data
+                    tr
+                        td #{quest.properties.name}
+                        td $#{quest.properties.reward}
+                        td #{quest.properties.description}

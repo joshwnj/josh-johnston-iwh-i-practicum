@@ -57,7 +57,8 @@ app.get('/update-cobj', (req, res) => {
   res.render('updates', {
     title: `Update Custom Object Form | ${SITE_TITLE}`,
     contactEmail,
-    quest
+    quest,
+    error: null
   })
 })
 
@@ -90,6 +91,16 @@ app.post('/update-cobj', async (req, res) => {
       res.redirect('/');
   } catch(err) {
       console.error(err);
+      res.render('updates', {
+        title: `Update Custom Object Form | ${SITE_TITLE}`,
+        contactEmail: '',
+        quest: {
+          name,
+          description,
+          reward
+        },
+        error: err.message
+      })
   }
 })
 
