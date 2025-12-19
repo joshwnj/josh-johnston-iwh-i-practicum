@@ -31,28 +31,51 @@ async function fetchQuests () {
   const resp = await axios.get(url, { headers } );
   const data = resp.data.results;
 
+  const contacts = await fetchAssociatedContacts(data)
+  return populateContacts({ data, contacts })
+}
+
+async function fetchAssociatedContacts (data) {
+  const url = `https://api.hubapi.com/crm/v3/objects/contacts/batch/read`
+  const headers = {
+      Authorization: `Bearer ${PRIVATE_APP_ACCESS}`,
+      'Content-Type': 'application/json'
+  };
+
+  const payload = {
+    inputs: data.map(item => item.associations?.contacts?.results[0].id)
+      .filter(Boolean)
+      .map(id => ({id}))
+  }
+
+  const resp = await axios.post(url, payload, { headers } );
+  return resp.data.results
+}
+
+function populateContacts ({ data, contacts }) {
+  // create a lookup of contacts
+  const contactsById = {}
+  for (const contact of contacts) {
+    const { id } = contact
+    contactsById[id] = contact
+  }
+
+  for (const quest of data) {
+    const contactId = quest.associations?.contacts?.results[0].id
+    quest.contact = contactsById[contactId] || {
+      properties: {
+        email: null
+      }
+    }
+  }
+
   return data
 }
 
 async function fetchSingleQuest({ id }) {
-  const qs = querystring.stringify({
-    properties: [
-      'name',
-      'description',
-      'reward'
-      ].join(',')
-  })
-  const url = `https://api.hubapi.com/crm/v3/objects/${OBJECT_TYPE_IDS.QUESTS}/${id}?${qs}`
-  const headers = {
-    Authorization: `Bearer ${PRIVATE_APP_ACCESS}`,
-    'Content-Type': 'application/json'
-  };
-
-
-  const resp = await axios.get(url, { headers });
-
-  const { data } = resp;
-  return data.properties
+  // TODO: optimise by only fetching one record
+  const quests = await fetchQuests()
+  return quests.find(quest => quest.id === id)
 }
 
 async function updateQuest ({ id, payload }) {

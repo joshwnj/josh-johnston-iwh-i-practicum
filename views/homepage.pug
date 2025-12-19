@@ -14,6 +14,7 @@ html(lang="en")
                         th Name
                         th Reward
                         th Description
+                        th Contact
                 tbody
                 each quest in data
                     tr
@@ -21,3 +22,4 @@ html(lang="en")
                             a(href=`/update-cobj?id=${quest.id}`) #{quest.properties.name}
                         td $#{quest.properties.reward}
                         td #{quest.properties.description}
+                        td #{quest.contact.properties.email}

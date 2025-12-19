@@ -14,15 +14,15 @@ html(lang="en")
                     input(type="hidden" name="id" value=id)
 
                     label(for="name") Contact Email
-                    input(type="text" name="contactEmail" value=contactEmail)
+                    input(type="text" name="contactEmail" value=quest.contact.properties.email)
 
                     label(for="name") Quest Name
-                    input(type="text" name="name" value=quest.name required)
+                    input(type="text" name="name" value=quest.properties.name required)
 
                     label(for="name") Description
-                    textarea(name="description" value=quest.description required)
+                    textarea(name="description" required) #{quest.properties.description}
 
                     label(for="reward") Reward ($)
-                    input(type="number" min="0" name="reward" value=quest.reward required)
+                    input(type="number" min="0" name="reward" value=quest.properties.reward required)
 
                     input(type="submit" value="Submit")

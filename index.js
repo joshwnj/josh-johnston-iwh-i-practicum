@@ -42,7 +42,14 @@ app.get('/update-cobj', async (req, res) => {
     }
   }
   else {
-    const quest = {}
+    const quest = {
+      properties: {},
+      contact: {
+        properties: {
+          email: null
+        }
+      }
+    }
 
     res.render('updates', {
       title: `Create Custom Object Form | ${SITE_TITLE}`,
