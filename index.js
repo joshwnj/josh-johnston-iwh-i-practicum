@@ -1,49 +1,24 @@
-require('dotenv').config()
-
 const express = require('express');
-const axios = require('axios');
 const app = express();
-const querystring = require('querystring');
+
+const service = require('./service')
 
 app.set('view engine', 'pug');
 app.use(express.static(__dirname + '/public'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// * Please DO NOT INCLUDE the private app access token in your repo. Don't do this practicum in your normal account.
-const { PRIVATE_APP_ACCESS } = process.env;
-
 const SITE_TITLE = 'Integrating With HubSpot I Practicum'
-
-// TODO: fetch from schema
-const OBJECT_TYPE_IDS = {
-  QUESTS: '2-54772188'
-}
 
 // ROUTE 1 - Create a new app.get route for the homepage to call your custom object data. Pass this data along to the front-end and create a new pug template in the views folder.
 
 // * Code for Route 1 goes here
 app.get('/', async (req, res) => {
-  const qs = querystring.stringify({
-    properties: [
-      'name',
-      'description',
-      'reward'
-      ].join(',')
-  })
-  const url = `https://api.hubapi.com/crm/v3/objects/${OBJECT_TYPE_IDS.QUESTS}?${qs}`
-  const headers = {
-      Authorization: `Bearer ${PRIVATE_APP_ACCESS}`,
-      'Content-Type': 'application/json'
-  };
-
   try {
-      const resp = await axios.get(url, { headers } );
-      const data = resp.data.results;
-
-      res.render('homepage', { title: `Home | ${SITE_TITLE}`, data });
+    const data = await service.fetchQuests()
+    res.render('homepage', { title: `Home | ${SITE_TITLE}`, data });
   } catch(err) {
-      console.error(err);
+    console.error(err);
   }
 })
 
@@ -54,25 +29,8 @@ app.get('/update-cobj', async (req, res) => {
   const { id } = req.query
 
   if (id) {
-    const qs = querystring.stringify({
-      properties: [
-        'name',
-        'description',
-        'reward'
-        ].join(',')
-    })
-    const url = `https://api.hubapi.com/crm/v3/objects/${OBJECT_TYPE_IDS.QUESTS}/${id}?${qs}`
-    const headers = {
-      Authorization: `Bearer ${PRIVATE_APP_ACCESS}`,
-      'Content-Type': 'application/json'
-    };
-
     try {
-      const resp = await axios.get(url, { headers });
-
-      const { data } = resp;
-      const quest = data.properties
-
+      const quest = await service.fetchSingleQuest({ id })
       res.render('updates', {
         title: `Update Custom Object Form | ${SITE_TITLE}`,
         id,
@@ -113,16 +71,12 @@ app.post('/update-cobj', async (req, res) => {
     }
   }
 
-  const url = `https://api.hubapi.com/crm/v3/objects/${OBJECT_TYPE_IDS.QUESTS}`
-  const headers = {
-      Authorization: `Bearer ${PRIVATE_APP_ACCESS}`,
-      'Content-Type': 'application/json'
-  };
-
   const isUpdate = !!id
   if (isUpdate) {
+
     try {
-      await axios.patch(`${url}/${id}`, payload, { headers });
+      await service.updateQuest({ id, payload })
+
       res.redirect('/');
     } catch (err) {
       console.error(err);
@@ -141,7 +95,7 @@ app.post('/update-cobj', async (req, res) => {
   } else {
     // create a new object
     try {
-      await axios.post(url, payload, { headers });
+      await service.createQuest({ payload })
       res.redirect('/');
     } catch (err) {
       console.error(err);
